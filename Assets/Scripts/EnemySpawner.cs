@@ -2,22 +2,30 @@
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject enemyPrefab;  // CubeのPrefab
-    [SerializeField] private int enemyCount = 24;     // 生成する数
-    [SerializeField] private float spawnRadius = 30f; // 生成する範囲の半径
+    [SerializeField] private GameObject enemyPrefab;  // 敵プレハブ
+    [SerializeField] private int enemyCount = 24;     // 生成数
+    [SerializeField] private float spawnDistance = 20f; // プレイヤーからの距離
+    [SerializeField] private float spread = 10f;        // 左右/上下に散らす幅
+
+    [SerializeField] private Transform player;  // プレイヤーをInspectorで指定
 
     void Start()
     {
         for (int i = 0; i < enemyCount; i++)
         {
-            // ランダムな位置を決める（XZ平面に広げる）
-            Vector3 pos = new Vector3(
-                Random.Range(-spawnRadius, spawnRadius),
-                Random.Range(0f, 5f),   // 高さは適当（0〜5の間とか）
-                Random.Range(-spawnRadius, spawnRadius)
-            );
+            // プレイヤーの前方ベクトル
+            Vector3 forward = player.forward;
 
-            // 生成
+            // プレイヤーの右方向と上方向を使って散らす
+            Vector3 right = player.right;
+            Vector3 up = player.up;
+
+            // 前方に配置 + ランダムで横・縦に散らす
+            Vector3 pos = player.position +
+                          forward * spawnDistance +
+                          right * Random.Range(-spread, spread) +
+                          up * Random.Range(-spread * 0.5f, spread * 0.5f);
+
             Instantiate(enemyPrefab, pos, Quaternion.identity);
         }
     }
